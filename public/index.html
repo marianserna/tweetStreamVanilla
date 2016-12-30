@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>TweetStream Baby</title>
+  </head>
+  <body>
+    <form id="search">
+      <input class="input" type="text">
+      <button type="submit">Find Tweets</button>
+    </form>
+    <ul class="tweets"></ul>
+
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script>
+      const socket = io(`${window.location.protocol}://${window.location.host}`);
+      const tweetsUl = document.querySelector('.tweets');
+      const input = document.querySelector('.input');
+      const form = document.getElementById('search').addEventListener('submit', (e) => {
+        e.preventDefault();
+        // clear the tweet list content
+        tweetsUl.innerHTML = "";
+        // Tell the server that there is a new search
+        socket.emit('search', input.value);
+      });
+
+      // Listen for events from the server (server emits tweets)
+      socket.on('tweet', (tweet) => {
+        // Set the innerHTML to be equal to the new tweet + the existing tweets that are already showing.
+        // (If you do += it will add the to the bottom instead)
+        tweetsUl.innerHTML = `<li>${tweet.text}</li>` + tweetsUl.innerHTML;
+      });
+
+    </script>
+  </body>
+</html>
